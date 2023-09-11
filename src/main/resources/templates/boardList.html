@@ -1,0 +1,68 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout=http://www.ultraq.net.nz/thymeleaf/layout
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/layout1}">
+
+    <div layout:fragment="content">
+        <div class="py-5 text-center">
+            <h2>글 목록</h2>
+        </div>
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-primary" th:href="@{/(keyword=${keyword}, orderby=id)}">최신 순</a>
+                <a class="btn btn-primary" th:href="@{/(keyword=${keyword}, orderby=cntReply)}">댓글 순</a>
+            </div>
+
+            <div class="col">
+                <button class="btn btn-primary float-right"
+                        onclick="location.href='addBoard.html'"
+                        th:onclick="|location.href='@{/create}'|"
+                        sec:authorize="isAuthenticated()"
+                        type="button" >글 등록</button>
+            </div>
+        </div>
+
+        <hr class="my-4">
+        <div class="cardTable">
+            <div th:each="board : ${boards}">
+                <a th:onclick="|location.href='@{/{boardId}(boardId=${board.id})}'|">
+                    <div class="card">
+                        <div class="card-header" th:style=" 'background-image: url('+${board.imgUrl}+')' ">
+                            <div class="card-header-is_closed">
+                                <div class="card-header-text">글 번호</div>
+                                <div class="card-header-number" th:text="${board.id}"></div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-body-header">
+                                <h1 class="card-body-header-text" th:text="${board.title}"></h1>
+                                <p class="card-body-nickname" th:text="|작성자 : ${board.writerEmail}|"></p>
+                            </div>
+                            <p class="card-body-description" th:text="${board.content}">
+                            </p>
+                            <div class="card-body-footer">
+                                <hr style="margin-bottom: 8px; opacity:0.5; border-color: #EF5A31">
+                                <p class="icon icon-comments_count" th:text="|댓글 수 : ${board.cntReply}|"></p>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div style="margin:auto;text-align:center;">
+        <a th:href = "@{/(page=0, keyword=${keyword})}" th:text ="처음으로"></a>
+        <th:block th:each="page:${#numbers.sequence(startPage, endPage)}">
+            <a th:if="${page != curPage}" th:href = "@{/(page=${page-1}, keyword=${keyword})}" th:text ="${page}"></a>
+            <strong th:if="${page==curPage}" th:text = "${page}" style="color:red"></strong>
+        </th:block>
+        <a th:href = "@{/(page=${totalPage-1}, keyword=${keyword})}" th:text ="마지막으로"></a>
+        </div>
+        <div style="margin:auto;text-align:center;">
+            <form th:action method="get" style="display:inline-block;">
+                <input type = "text" name="keyword">
+                <button class="searchBtn" type="submit">검색</button>
+            </form>
+        </div>
+    </div>
+</html>
